@@ -28,7 +28,7 @@ def setup():
     # 5. income
     par['tax_rate'] = 0.0
     par['kappa'] = 1
-    par['sigma_xi'] = 0.1  # capital uncertainty
+    par['sigma_qå'] = 0.1  # capital uncertainty
     par['UB'] = 0.0
     
     # 6. saving
@@ -43,7 +43,7 @@ def setup():
     par['k_max'] = 10.0
     par['k_phi'] = 1.0  # curvature parameters
     
-    par['Nxi'] = 8
+    par['Nqå'] = 8
     par['Nm'] = 200
     par['Na'] = 200
     par['Nk'] = 150
@@ -56,7 +56,7 @@ def create_grids(par):
     assert par['Nm'] == par['Na'], 'Nm should equal Na'
     
     # Shocks
-    par['xi'], par['xi_w'] = GaussHermite_lognorm(par['sigma_xi'], par['Nxi'])
+    par['qå'], par['qå_w'] = GaussHermite_lognorm(par['sigma_qå'], par['Nqå'])
     
     # End-of-period assets
     par['grid_a'] = [nonlinspace(1e-6, par['a_max'], par['Na'] * 8, par['a_phi']).reshape((par['Na'], 8)) for _ in range(par['T'])]
@@ -128,10 +128,10 @@ def utility(c, h_choice, par):
 def egm(t, h_choice, k, v_plus_interp, c_plus_interp, par):
     a = par['grid_a'][t]
     k = np.tile(k, (par['Na'], 1))  # Expand k across asset points
-    w = np.tile(par['xi_w'], (par['Na'], 1))  # Ensure weights are tiled similarly
-    xi = np.tile(par['xi'], (par['Na'], 1))  # Make sure xi is correctly tiled
+    w = np.tile(par['qå_w'], (par['Na'], 1))  # Ensure weights are tiled similarly
+    qå = np.tile(par['qå'], (par['Na'], 1))  # Make sure qå is correctly tiled
 
-    k_plus = k_trans(k, h_choice, xi, par)  # Ensure operations here don't alter shapes unexpectedly
+    k_plus = k_trans(k, h_choice, qå, par)  # Ensure operations here don't alter shapes unexpectedly
     m_plus = m_trans(a, k, k_plus, h_choice, par)
 
     # Debug output shapes
@@ -148,9 +148,9 @@ def egm(t, h_choice, k, v_plus_interp, c_plus_interp, par):
     return c_raw, m_raw, v_plus_raw
 
 
-def k_trans(k, h_choice, xi, par):
+def k_trans(k, h_choice, qå, par):
     h_hour = par['h'][h_choice]
-    return ((1 - par['delta']) * k + par['phi_1'] * h_hour ** par['phi_2']) * xi
+    return ((1 - par['delta']) * k + par['phi_1'] * h_hour ** par['phi_2']) * qå
 
 
 def m_trans(a, k, k_plus, h_choice, par):
