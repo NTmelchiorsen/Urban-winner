@@ -334,8 +334,8 @@ class Model:
             # Loop through common grid
             for j in range(len(grid_m)):
                 m_now = grid_m[j]
-                do_interp = (m_now >= m_low) and (m_now <= m_high)
-                do_extrap = (m_now > m_high) and (i == len(m_raw) - 1)
+                do_interp = np.all((m_now >= m_low) & (m_now <= m_high))
+                do_extrap = np.all((m_now > m_high) & (i == len(m_raw) - 1))
 
                 if do_interp or do_extrap:
                     # Consumption
