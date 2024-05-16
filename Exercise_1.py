@@ -5,7 +5,7 @@ import scipy.optimize as optimize
 import matplotlib.pyplot as plt
 
 def util(c,par):
-    return (c**(1.0-par.rho))/(1.0-par.rho)
+    return (c**(1.0-par.rho))/(1.0-par.rho)-par.beta*((par.h^par.alpha)/par.alpha)  #her har jeg tilføjet den sidste del(fra -beta)
 
 def marg_util(c,par):
     return c**(-par.rho)
@@ -13,13 +13,25 @@ def marg_util(c,par):
 def setup():
     # Setup specifications in class. 
     class par: pass
-    par.beta = 0.98
-    par.rho = 0.5
-    par.R = 1.0/par.beta
+    par.beta = 0.95
+    par.rho = 0.75
+    par.R = 1.05
     par.sigma = 0.2
     par.mu = 0
     par.M = 10
-    par.T = 40
+    par.T = 40  #har jeg ændret fra 10 til 40
+    par.alpha =  1.5 #tilføjet af mig
+    par.h = 0.5 #starter med at sætte den lig 0, men ændrer den senere til np.array([0, 0.5, 1])
+
+    #herunder er dem jeg ikke bruger i første omgang
+    par.UB = 0
+    par.kappa = 1
+    par.delta = 0.1
+    par.sigma_eta = 0.25
+    par.sigma_xi = 0.1
+    par.b = 1.8
+    par.psi1 = 0.2
+    par.psi2 = 0.6
     
     # Gauss Hermite weights and poins
     par.num_shocks = 5
@@ -29,7 +41,7 @@ def setup():
     
     # Simulation parameters
     par.simN = 10000
-    par.M_ini = 1.5
+    par.M_ini = 1
     
     # Grid
     par.num_M = 100
@@ -136,7 +148,7 @@ def simulate (par,sol):
     dim = (par.simN,par.T)
     sim.M = par.M_ini*np.ones(dim)
     sim.C = np.nan +np.zeros(dim)
-    np.random.seed(2022)
+    np.random.seed(2024)
 
     # Simulate 
     for t in range(par.T): #Loop forward in time
